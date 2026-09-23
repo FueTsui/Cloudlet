@@ -6,7 +6,7 @@ Cloudlet（原 RcloneLink）的 C# 原生 Windows 应用，使用 .NET 10、WinU
 
 ## 使用
 
-从 [GitHub Release v2.0.0](https://github.com/FueTsui/RcloneLink/releases/tag/v2.0.0) 下载 `Cloudlet-2.0.0-Setup-x64.exe`，或解压 `Cloudlet-2.0.0-win-x64.zip` 后运行其中的 `Cloudlet.exe`。便携包也将用户设置存放在 AppData；请保持整个应用目录完整，不要只复制 EXE。运行无需另装 .NET，磁盘挂载需要 WinFsp。
+从 [GitHub Release v2.0.0](https://github.com/FueTsui/Cloudlet/releases/tag/v2.0.0) 下载 `Cloudlet-2.0.0-Setup-x64.exe`，或解压 `Cloudlet-2.0.0-win-x64.zip` 后运行其中的 `Cloudlet.exe`。便携包也将用户设置存放在 AppData；请保持整个应用目录完整，不要只复制 EXE。运行无需另装 .NET，磁盘挂载需要 WinFsp。
 
 - **概览**：查看引擎、驱动和挂载状态。
 - **远程连接**：创建 WebDAV、检查连接、管理已有远程。点击“添加其他存储”，在应用内选择提供商、填写参数并完成授权。支持搜索、基础/高级选项、密码输入和分步配置；需要登录的云服务通过系统浏览器授权，不再打开命令行窗口。
