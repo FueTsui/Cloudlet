@@ -8,17 +8,17 @@ Set-StrictMode -Version Latest
 $destinationRoot = [IO.Path]::GetFullPath($DestinationDirectory)
 
 # Fixed upstream releases, verified against the existing release inputs.
-# Archive hash: https://downloads.rclone.org/v1.70.3/SHA256SUMS
+# Archive hash: https://downloads.rclone.org/v1.75.1/SHA256SUMS
 # MSI hash/URL: https://github.com/winfsp/winfsp/releases/tag/v2.1
 #              https://api.github.com/repos/winfsp/winfsp/releases/tags/v2.1
 $dependencies = @(
     @{
         Name = 'rclone.exe'
-        Sha256 = '3e36b396c4cb71b8eaae2300c21bec26700b27ce5f6be83ef6b86d214e294c8b'
-        Uri = 'https://downloads.rclone.org/v1.70.3/rclone-v1.70.3-windows-amd64.zip'
-        DownloadName = 'rclone-v1.70.3-windows-amd64.zip'
-        DownloadSha256 = '1c75923b4d3f0b3d1faf16447a442b5aaed0cfc32997b3381eb96fd087603a30'
-        ArchiveEntry = 'rclone-v1.70.3-windows-amd64/rclone.exe'
+        Sha256 = '033eee51c9ad47c2de2624b6674d355274bcd6cf0027a5f85db4437ba24ae81c'
+        Uri = 'https://downloads.rclone.org/v1.75.1/rclone-v1.75.1-windows-amd64.zip'
+        DownloadName = 'rclone-v1.75.1-windows-amd64.zip'
+        DownloadSha256 = '200eb602c126d82aa38b51e0f6b9ae837473ff99b51278d3f6f837574c494d6e'
+        ArchiveEntry = 'rclone-v1.75.1-windows-amd64/rclone.exe'
     },
     @{
         Name = 'winfsp-2.1.25156.msi'

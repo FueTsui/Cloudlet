@@ -11,7 +11,7 @@
 #define AppExe "Cloudlet.exe"
 
 [Setup]
-; Keep the exact historical AppId spelling so existing per-user registration is reused.
+; Preserve product identity. Administrative installs register under HKLM.
 AppId={{6ffd6ec1-6466-49e3-b643-276d65864d98}}
 AppName={#AppName}
 AppVersion={#AppVersion}
@@ -21,15 +21,14 @@ AppSupportURL=https://github.com/FueTsui/Cloudlet
 VersionInfoVersion={#AppVersion}
 VersionInfoProductName={#AppName}
 VersionInfoDescription=Cloudlet for Windows 11
-DefaultDirName={localappdata}\Programs\Cloudlet
+DefaultDirName={autopf}\Cloudlet
 DefaultGroupName={#AppName}
-; In non-administrative mode Inno reads previous installation data from HKCU only.
-; Reusing the previous directory keeps its uninstall log with the same AppId.
-; HKLM installations are not inherited, uninstalled, or modified.
-UsePreviousAppDir=yes
+; Always offer Program Files, even if an earlier version was installed per-user.
+; Existing per-user installations and their uninstall registrations are preserved.
+UsePreviousAppDir=no
 UsePreviousPrivileges=no
 UsePreviousGroup=no
-PrivilegesRequired=lowest
+PrivilegesRequired=admin
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0.22000
@@ -73,7 +72,7 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExe}"; WorkingDir: "{app
 
 [Run]
 Filename: "{sys}\msiexec.exe"; Parameters: "/i ""{app}\winfsp-2.1.25156.msi"""; Verb: "runas"; Description: "{cm:InstallWinFsp}"; Flags: shellexec postinstall unchecked skipifsilent waituntilterminated; Check: WinFspNotInstalled
-Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchProgram,{#AppName}}"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchProgram,{#AppName}}"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent runasoriginaluser
 
 ; No startup registration, legacy uninstaller execution, or user-data deletion.
 ; AppData\RcloneLink and rclone configuration/cache remain application-owned.

@@ -13,6 +13,7 @@ public partial class App : Application
     private AppState? _state;
     private SettingsStore? _store;
     private MountManager? _mounts;
+    private Task? _autoMountTask;
     private TrayIcon? _tray;
     private Mutex? _instance;
     private bool _ownsMutex, _exiting, _allowWindowClose;
@@ -36,6 +37,7 @@ public partial class App : Application
     protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
         var command = Environment.GetCommandLineArgs();
+        var silent = command.Contains("--minimized");
         var smokeIndex = Array.IndexOf(command, "--ui-smoke");
         var smokeDirectory = smokeIndex >= 0 && smokeIndex + 1 < command.Length ? Path.GetFullPath(command[smokeIndex + 1]) : null;
         var dataIndex = Array.IndexOf(command, "--data-dir");
@@ -46,7 +48,7 @@ public partial class App : Application
         _instance = new Mutex(true, @"Local\" + _pipeName, out _ownsMutex);
         if (!_ownsMutex)
         {
-            try { using var pipe = new NamedPipeClientStream(".", _pipeName, PipeDirection.Out); await pipe.ConnectAsync(2500); await pipe.WriteAsync("show"u8.ToArray()); }
+            try { if (!silent) { using var pipe = new NamedPipeClientStream(".", _pipeName, PipeDirection.Out); await pipe.ConnectAsync(2500); await pipe.WriteAsync("show"u8.ToArray()); } }
             catch { }
             Exit(); return;
         }
@@ -62,6 +64,8 @@ public partial class App : Application
                 _state.Settings.AutoMount = false;
                 _state.Settings.StartWithWindows = false;
                 _state.Settings.TrayVisible = false;
+                _state.Settings.CheckDependencyUpdates = false;
+                _state.Settings.AutoUpdateRclone = false;
             }
             _store.Save(_state);
             var service = new RcloneService(_state.Settings);
@@ -78,8 +82,10 @@ public partial class App : Application
             };
             _tray = new TrayIcon(WinRT.Interop.WindowNative.GetWindowHandle(_window), ShowWindow, () => _ = ExitAsync(), () => _window.DispatcherQueue.TryEnqueue(_window.RefreshBrandIcons));
             _tray.SetVisible(_state.Settings.TrayVisible);
-            _window.Activate();
+            if (!silent || smokeDirectory != null) _window.Activate();
             _ = ListenAsync();
+            await _window.InitializeAsync();
+            if (_exiting) return;
             if (smokeDirectory != null)
             {
                 Directory.CreateDirectory(smokeDirectory);
@@ -88,16 +94,24 @@ public partial class App : Application
                 await ExitAsync();
                 return;
             }
-            if (command.Contains("--minimized")) _window.AppWindow.Hide();
             if (_state.Settings.AutoMount)
             {
-                foreach (var mount in _state.Mounts.Where(m => m.AutoMount).ToArray())
-                {
-                    if (_autoMount.IsCancellationRequested) break;
-                    try { await _mounts.StartAsync(mount, _autoMount.Token); }
-                    catch (Exception) { /* MountManager reports errors in its status stream. */ }
-                }
+                _autoMountTask = _mounts.StartAutomaticAsync(_state.Mounts, _autoMount.Token);
+                try { await _autoMountTask; }
+                catch (OperationCanceledException) when (_autoMount.IsCancellationRequested) { return; }
             }
+            if (command.Contains("--startup-smoke") && dataDirectory != null)
+            {
+                await Task.Delay(1500);
+                await File.WriteAllTextAsync(Path.Combine(dataDirectory, "startup-smoke.json"), System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    silent, visible = _window.AppWindow.IsVisible,
+                    mounts = _mounts.GetStates().Select(s => new { s.Id, status = s.Status.ToString(), s.ProcessId })
+                }));
+                await ExitAsync();
+                return;
+            }
+            _window.StartUpdateChecks();
         }
         catch (Exception error)
         {
@@ -105,6 +119,12 @@ public partial class App : Application
             {
                 Directory.CreateDirectory(smokeDirectory);
                 await File.WriteAllTextAsync(Path.Combine(smokeDirectory, "startup-error.txt"), error.ToString());
+            }
+            else if (silent)
+            {
+                var logDirectory = dataDirectory ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "RcloneLink", "v2");
+                Directory.CreateDirectory(logDirectory);
+                await File.WriteAllTextAsync(Path.Combine(logDirectory, "startup-error.txt"), $"{DateTimeOffset.Now:O} {error.GetType().Name}：后台启动未完成，请手动打开 Cloudlet 检查设置。");
             }
             else
             {
@@ -151,6 +171,7 @@ public partial class App : Application
         var stoppingMounts = false;
         try
         {
+            if (_autoMountTask != null) { try { await _autoMountTask; } catch (OperationCanceledException) { } }
             if (_window != null) await _window.ShutdownAsync();
             stoppingMounts = true;
             if (_mounts != null) await _mounts.StopAllAsync();

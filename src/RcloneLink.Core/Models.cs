@@ -12,6 +12,8 @@ public sealed class AppSettings
     public bool CloseToTray { get; set; } = true;
     public bool StartWithWindows { get; set; }
     public bool AutoMount { get; set; }
+    public bool CheckDependencyUpdates { get; set; } = true;
+    public bool AutoUpdateRclone { get; set; } = true;
     public Dictionary<string, string> DefaultMountOptions { get; set; } = CommandBuilder.DefaultMountOptions();
 }
 

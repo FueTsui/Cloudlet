@@ -10,16 +10,19 @@ namespace RcloneLink.App;
 
 public sealed partial class MainWindow
 {
+    private TextBox? _settingsRclonePath;
     private FrameworkElement BuildSettingsPage()
     {
         var page = Page("设置", "调整运行环境、外观与 Windows 集成。", out var body);
-        var rclone = TextInput("SettingsRclonePath", "rclone 可执行文件", _state.Settings.RclonePath);
+        var rclone = _settingsRclonePath = TextInput("SettingsRclonePath", "rclone 可执行文件", _state.Settings.RclonePath);
         var config = TextInput("SettingsConfigPath", "rclone 配置文件", _state.Settings.ConfigPath);
         var theme = SelectInput("SettingsTheme", "应用主题", ["跟随 Windows", "浅色", "深色"], _state.Settings.Theme switch { "Light" => "浅色", "Dark" => "深色", _ => "跟随 Windows" });
         var tray = Toggle("SettingsTray", "显示系统托盘图标", _state.Settings.TrayVisible);
         var closeToTray = Toggle("SettingsCloseToTray", "关闭窗口时隐藏到托盘", _state.Settings.CloseToTray);
         var startup = Toggle("SettingsStartup", "登录 Windows 时启动", _state.Settings.StartWithWindows);
         var autoMount = Toggle("SettingsAutoMount", "启动后自动挂载", _state.Settings.AutoMount);
+        var checkUpdates = Toggle("SettingsCheckUpdates", "自动检查依赖最新稳定版", _state.Settings.CheckDependencyUpdates);
+        var autoUpdate = Toggle("SettingsAutoUpdate", "空闲时自动更新 rclone", _state.Settings.AutoUpdateRclone);
         body.Children.Add(Label("运行环境", 18, true));
         body.Children.Add(Card(Stack(
             SettingsPathRow(rclone, "PickRclonePath", async () =>
@@ -32,10 +35,11 @@ public sealed partial class MainWindow
                 var selected = await NativeIntegration.PickFileAsync(this, "选择 rclone 配置文件", ".conf");
                 if (selected != null) config.Text = selected;
             }),
-            Hint("支持已有 rclone.conf。路径不存在时，添加连接将创建配置文件。修改运行路径前请停止挂载与传输。"))));
+            Hint("支持已有 rclone.conf。路径不存在时，添加连接将创建配置文件。修改运行路径前请停止挂载与传输。"),
+            TwoColumns(checkUpdates, autoUpdate), Hint("启动时及每 6 小时检查一次。WinFsp 需在概览中点击安装 / 更新。"))));
         body.Children.Add(Label("外观与启动", 18, true));
         body.Children.Add(Card(Stack(theme, TwoColumns(tray, closeToTray), TwoColumns(startup, autoMount),
-            Hint("关闭窗口时隐藏到托盘，需要启用托盘图标。自动挂载还需在每个挂载配置中开启“随应用自动挂载”。"))));
+            Hint("登录启动将静默运行。自动挂载还需在每个挂载配置中开启“随应用自动挂载”。"), _settingsStartupStatus)));
         body.Children.Add(ActionButton("SaveSettings", "保存设置", async () =>
         {
             var rclonePath = rclone.Text.Trim().Trim('"');
@@ -57,6 +61,8 @@ public sealed partial class MainWindow
             _state.Settings.CloseToTray = closeToTray.IsOn;
             _state.Settings.StartWithWindows = startup.IsOn;
             _state.Settings.AutoMount = autoMount.IsOn;
+            _state.Settings.CheckDependencyUpdates = checkUpdates.IsOn;
+            _state.Settings.AutoUpdateRclone = autoUpdate.IsOn;
             SaveState();
             ApplyTheme();
             await RefreshHealthAsync();
@@ -80,7 +86,7 @@ public sealed partial class MainWindow
                 }))
             })));
         body.Children.Add(Label("关于 Cloudlet", 18, true));
-        body.Children.Add(Card(Stack(Label("Cloudlet 2.0", 18, true),
+        body.Children.Add(Card(Stack(Label(ProductLabel, 18, true),
             Label("C# · WinUI 3 · Windows 11"),
             Hint("rclone — Copyright © The rclone authors · MIT License"),
             SimpleButton("RcloneLicense", "查看 rclone 开源许可", () => NativeIntegration.OpenUrl("https://github.com/rclone/rclone/blob/master/COPYING")),

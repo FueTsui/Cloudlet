@@ -48,7 +48,7 @@ function Resolve-DotnetExecutable([string]$RequestedPath) {
 }
 $DotnetPath = Resolve-DotnetExecutable $DotnetPath
 if (-not (Test-Path -LiteralPath $projectPath -PathType Leaf)) { throw "Project not found: $projectPath" }
-foreach ($requiredFile in @('rclone.exe', 'winfsp-2.1.25156.msi', 'assets\Cloudlet\icon.ico', 'assets\Cloudlet\icon.png', 'assets\Cloudlet\icon-black.ico', 'assets\Cloudlet\icon-white.ico', 'THIRD-PARTY-NOTICES.md', 'docs\licenses\rclone-1.70.3-COPYING.txt', 'docs\licenses\WinFsp-2.1-License.txt')) {
+foreach ($requiredFile in @('rclone.exe', 'winfsp-2.1.25156.msi', 'assets\Cloudlet\icon.ico', 'assets\Cloudlet\icon.png', 'assets\Cloudlet\icon-black.ico', 'assets\Cloudlet\icon-white.ico', 'THIRD-PARTY-NOTICES.md', 'docs\licenses\rclone-1.75.1-COPYING.txt', 'docs\licenses\WinFsp-2.1-License.txt')) {
     if (-not (Test-Path -LiteralPath (Join-Path $repoRoot $requiredFile) -PathType Leaf)) { throw "Required release input not found: $requiredFile" }
 }
 
@@ -59,7 +59,7 @@ try {
     $rcloneVersionOutput = @(& (Join-Path $repoRoot 'rclone.exe') version)
     $rcloneExitCode = $LASTEXITCODE
     $rcloneVersion = ([string]$rcloneVersionOutput[0]).Trim()
-    if ($rcloneExitCode -ne 0 -or $rcloneVersion -ne 'rclone v1.70.3') { throw "Expected the existing rclone v1.70.3; found: $rcloneVersion" }
+    if ($rcloneExitCode -ne 0 -or $rcloneVersion -ne 'rclone v1.75.1') { throw "Expected the existing rclone v1.75.1; found: $rcloneVersion" }
     Assert-ReleasePath $stagingDirectory
     New-Item -ItemType Directory -Path $stagingDirectory -Force | Out-Null
 

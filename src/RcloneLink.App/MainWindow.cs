@@ -90,7 +90,7 @@ public sealed partial class MainWindow : Window
         _navigation.MenuItems.Add(NavigationItem("transfers", "传输任务", "\uE8AB"));
         _navigation.PaneFooter = new TextBlock
         {
-            Text = "Cloudlet 2.0",
+            Text = ProductLabel,
             FontSize = 11,
             Opacity = .65,
             Margin = new Thickness(20, 12, 12, 20),
@@ -128,14 +128,6 @@ public sealed partial class MainWindow : Window
         ShowPage("overview");
         _mounts.StatusChanged += OnMountStatusChanged;
         _mounts.OutputReceived += OnMountOutput;
-        _root.Loaded += async (_, _) =>
-        {
-            if (_started) return;
-            _started = true;
-            await RunUiAsync(RefreshHealthAsync, "检查运行环境");
-            await RunUiAsync(RefreshRemotesAsync, "读取远程连接");
-            RefreshMountRows();
-        };
     }
 
     private NavigationViewItem NavigationItem(string key, string text, string glyph)
@@ -342,6 +334,10 @@ public sealed partial class MainWindow : Window
 
     public async Task ShutdownAsync()
     {
+        _updateTimer?.Stop();
+        _updateLifetime.Cancel();
+        if (_updateTask != null) await _updateTask;
+        if (_installerTask != null) { try { await _installerTask; } catch { /* The initiating UI action reports installer errors. */ } }
         _transferCancellation?.Cancel();
         if (_transferTask != null) { try { await _transferTask; } catch { } }
         await CancelProviderWizardAsync(false);

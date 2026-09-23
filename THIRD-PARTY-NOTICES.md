@@ -2,15 +2,15 @@
 
 Cloudlet invokes the existing rclone executable as a separate process. The optional WinFsp installer is distributed unchanged; it is not run as part of building or packaging this application. Copyright and license ownership remain with the respective projects.
 
-## rclone 1.70.3
+## rclone 1.75.1
 
 - Copyright (C) 2012 by Nick Craig-Wood.
 - License: MIT.
 - Bundled file: `rclone.exe`.
-- License copy: `docs/licenses/rclone-1.70.3-COPYING.txt`.
+- License copy: `docs/licenses/rclone-1.75.1-COPYING.txt`.
 - [Official license page](https://rclone.org/licence/).
-- [Version 1.70.3 license](https://github.com/rclone/rclone/blob/v1.70.3/COPYING).
-- [Version 1.70.3 source](https://github.com/rclone/rclone/tree/v1.70.3).
+- [Version 1.75.1 license](https://github.com/rclone/rclone/blob/v1.75.1/COPYING).
+- [Version 1.75.1 source](https://github.com/rclone/rclone/tree/v1.75.1).
 
 The pinned release's COPYING file is the authoritative copyright and license text for this bundled version. The current website may show a different copyright year.
 

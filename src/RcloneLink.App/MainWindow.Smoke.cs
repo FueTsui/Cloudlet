@@ -28,7 +28,7 @@ public sealed partial class MainWindow
         if (_providerCatalog.Count == 0 || _providerError.IsOpen) throw new InvalidOperationException("提供商目录未加载。");
         if ((_navigation.PaneFooter as TextBlock)?.Text.Contains("基于 rclone", StringComparison.Ordinal) != false)
             throw new InvalidOperationException("侧边栏描述未移除。");
-        if (Title != "Cloudlet" || _navigation.PaneTitle != "Cloudlet" || (_navigation.PaneFooter as TextBlock)?.Text != "Cloudlet 2.0")
+        if (Title != "Cloudlet" || _navigation.PaneTitle != "Cloudlet" || (_navigation.PaneFooter as TextBlock)?.Text != ProductLabel)
             throw new InvalidOperationException("Cloudlet 窗口名称未完整更新。");
         var startupCommand = $"\"{Environment.ProcessPath}\" --minimized";
         if (!NativeIntegration.IsProductStartupCommand(startupCommand) || NativeIntegration.IsProductStartupCommand(startupCommand + " --unexpected"))

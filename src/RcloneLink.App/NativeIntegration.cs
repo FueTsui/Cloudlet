@@ -10,14 +10,44 @@ namespace RcloneLink.App;
 public static class NativeIntegration
 {
     public static bool IsWinFspInstalled()
+        => GetWinFspVersion() != null;
+
+    public static Version? GetWinFspVersion()
     {
         foreach (var view in new[] { RegistryView.Registry64, RegistryView.Registry32 })
         {
             using var hive = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, view);
             using var key = hive.OpenSubKey(@"SOFTWARE\WinFsp");
-            if (key?.GetValue("InstallDir") is string location && File.Exists(Path.Combine(location, "bin", "winfsp-x64.dll"))) return true;
+            if (key?.GetValue("InstallDir") is string location && File.Exists(Path.Combine(location, "bin", "winfsp-x64.dll")))
+                return DependencyUpdates.ParseVersion(FileVersionInfo.GetVersionInfo(Path.Combine(location, "bin", "winfsp-x64.dll")).FileVersion ?? "0.0.0");
         }
-        return File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "WinFsp", "bin", "winfsp-x64.dll"));
+        var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "WinFsp", "bin", "winfsp-x64.dll");
+        return File.Exists(path) ? DependencyUpdates.ParseVersion(FileVersionInfo.GetVersionInfo(path).FileVersion ?? "0.0.0") : null;
+    }
+
+    public static string GetStartupStatus()
+    {
+        using var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run");
+        if (key?.GetValue("Cloudlet") is not string command) return "未注册登录启动；请在设置中开启并保存。";
+        var expected = $"\"{Environment.ProcessPath}\" --minimized";
+        if (!command.Equals(expected, StringComparison.OrdinalIgnoreCase)) return "启动项指向其他路径或参数不符；请重新保存设置。";
+        foreach (var location in new[] { "Run", "Run32" })
+        {
+            using var approved = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\" + location);
+            if (approved?.GetValue("Cloudlet") is byte[] value && value.Length > 0 && (value[0] & 1) != 0)
+                return "启动项已被 Windows 禁用；请在任务管理器的启动应用中启用 Cloudlet。";
+        }
+        return "登录启动已注册：后台静默运行，不显示主窗口。";
+    }
+
+    public static async Task<bool> InstallWinFspAsync(string path)
+    {
+        var info = new ProcessStartInfo(Path.Combine(Environment.SystemDirectory, "msiexec.exe")) { UseShellExecute = true, Verb = "runas" };
+        foreach (var argument in new[] { "/i", path, "/passive", "/norestart" }) info.ArgumentList.Add(argument);
+        using var process = Process.Start(info) ?? throw new InvalidOperationException("无法启动 WinFsp 安装程序。");
+        await process.WaitForExitAsync();
+        if (process.ExitCode is not (0 or 3010)) throw new InvalidOperationException($"WinFsp 安装未完成（{process.ExitCode}）。");
+        return process.ExitCode == 3010;
     }
 
     public static void SetStartup(bool enabled)

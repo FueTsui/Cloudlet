@@ -16,6 +16,26 @@ public sealed class MountManager(RcloneService service) : IAsyncDisposable
     public IReadOnlyList<MountState> GetStates() { lock (_stateLock) return _states.Values.ToArray(); }
     public MountState GetState(string id) { lock (_stateLock) return _states.GetValueOrDefault(id) ?? new(id, MountStatus.Stopped, "未挂载"); }
 
+    public async Task StartAutomaticAsync(IEnumerable<MountProfile> profiles, CancellationToken token = default)
+    {
+        var pending = profiles.Where(p => p.AutoMount).ToList();
+        for (var attempt = 0; attempt < 3 && pending.Count > 0; attempt++)
+        {
+            if (attempt > 0) await Task.Delay(TimeSpan.FromSeconds(10 * attempt), token);
+            foreach (var profile in pending.ToArray())
+            {
+                token.ThrowIfCancellationRequested();
+                try
+                {
+                    var state = await StartAsync(profile, token);
+                    if (state.Status == MountStatus.Mounted) pending.Remove(profile);
+                }
+                catch (OperationCanceledException) when (token.IsCancellationRequested) { throw; }
+                catch (Exception ex) { SetState(new(profile.Id, MountStatus.Failed, ex.Message)); }
+            }
+        }
+    }
+
     public async Task<MountState> StartAsync(MountProfile profile, CancellationToken cancellationToken = default)
     {
         await _operations.WaitAsync(cancellationToken).ConfigureAwait(false);

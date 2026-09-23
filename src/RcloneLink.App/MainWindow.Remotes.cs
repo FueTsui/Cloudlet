@@ -45,11 +45,18 @@ public sealed partial class MainWindow
         body.Children.Add(Label("运行环境", 18, true));
         body.Children.Add(Card(Stack(
             StatusRow("\uE756", "rclone", "云存储与文件传输引擎", _versionValue),
+            _rcloneUpdate,
             new Border { Height = 1, Background = new SolidColorBrush(Windows.UI.Color.FromArgb(35, 128, 128, 128)) },
             StatusRow("\uEDA2", "WinFsp", "将远程存储挂载为 Windows 磁盘所需的驱动", _winFspValue),
+            _winFspUpdate,
             Horizontal(ActionButton("RefreshHealth", "重新检查", RefreshHealthAsync, "\uE72C"),
-                SimpleButton("InstallWinFsp", "安装 / 修复 WinFsp", () => NativeIntegration.InstallWinFsp())),
+                ActionButton("CheckUpdates", "检查最新版本", () => ManualUpdateCheckAsync(false)),
+                ActionButton("UpdateRclone", "更新 rclone", () => ManualUpdateCheckAsync(true))),
+            ActionButton("InstallWinFsp", "安装 / 更新 WinFsp", UpdateWinFspAsync),
+            Hint("自动更新 rclone 会保留旧引擎；使用中暂缓。WinFsp 安装需要管理员权限。"),
             _healthChecked)));
+        body.Children.Add(Label("开机启动与自动挂载", 18, true));
+        body.Children.Add(Card(Stack(_startupStatus, SimpleButton("StartupSettings", "配置启动与挂载", () => Navigate("settings")))));
         body.Children.Add(Label("常用操作", 18, true));
         body.Children.Add(Card(Stack(
             Horizontal(SimpleButton("OverviewMounts", "管理磁盘挂载", () => Navigate("mounts"), "\uEDA2"),
@@ -80,7 +87,8 @@ public sealed partial class MainWindow
 
     private async Task RefreshHealthAsync()
     {
-        _winFspValue.Text = NativeIntegration.IsWinFspInstalled() ? "已安装" : "尚未安装";
+        var winFsp = NativeIntegration.GetWinFspVersion();
+        _winFspValue.Text = winFsp != null ? "WinFsp " + winFsp.ToString(3) : "尚未安装";
         try
         {
             var version = await _service.GetVersionAsync(_lifetime.Token);
@@ -102,6 +110,7 @@ public sealed partial class MainWindow
         _remoteCount.Text = _remotes.Count.ToString();
         _profileCount.Text = _state.Mounts.Count.ToString();
         _mountCount.Text = _mounts.GetStates().Count(s => s.Status == MountStatus.Mounted).ToString();
+        RefreshStartupStatus();
     }
 
     private FrameworkElement BuildRemotesPage()

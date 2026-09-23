@@ -22,6 +22,46 @@ Directory.CreateDirectory(Path.Combine(source, "folder"));
 await File.WriteAllTextAsync(Path.Combine(source, "folder", "nested.txt"), "nested data");
 
 await Test("真实 rclone 版本", async () => Assert((await service.GetVersionAsync()).StartsWith("rclone v"), "version"));
+await Test("更新版本比较与设置持久化", () =>
+{
+    Assert(DependencyUpdates.ParseVersion("rclone v1.75.1\n- os/windows") > DependencyUpdates.ParseVersion("rclone v1.70.3"), "version order");
+    Assert(DependencyUpdates.ParseVersion("2.1.25156.0") == DependencyUpdates.ParseVersion("winfsp-2.1.25156.msi"), "WinFsp version normalization");
+    var store = new SettingsStore(Path.Combine(root, "update-settings"));
+    var state = new AppState();
+    Assert(state.Settings.CheckDependencyUpdates && state.Settings.AutoUpdateRclone, "defaults");
+    state.Settings.CheckDependencyUpdates = state.Settings.AutoUpdateRclone = false;
+    store.Save(state);
+    Assert(!store.Load().Settings.AutoUpdateRclone && !store.Load().Settings.CheckDependencyUpdates, "settings round trip");
+    return Task.CompletedTask;
+});
+await Test("自动挂载跳过未选项并响应取消", async () =>
+{
+    await using var manager = new MountManager(service);
+    await manager.StartAutomaticAsync([new MountProfile { AutoMount = false }]);
+    Assert(manager.GetStates().Count == 0, "unselected started");
+    using var cancellation = new CancellationTokenSource();
+    cancellation.Cancel();
+    await Throws<OperationCanceledException>(() => manager.StartAutomaticAsync([new MountProfile { AutoMount = true }], cancellation.Token));
+});
+if (args.Contains("--updates"))
+    await Test("官方版本检测、真实更新下载与安装包校验", async () =>
+    {
+        var updates = new DependencyUpdates();
+        using var timeout = new CancellationTokenSource(TimeSpan.FromMinutes(5));
+        var latest = await updates.CheckRcloneAsync(timeout.Token);
+        var originalHash = Hash(executable);
+        var olderEngine = Path.GetFullPath("artifacts/dependency-backup-1.70.3/rclone.exe");
+        var updaterService = File.Exists(olderEngine) ? new RcloneService(new AppSettings { RclonePath = olderEngine, ConfigPath = settings.ConfigPath }) : service;
+        var target = await updates.StageRcloneAsync(updaterService, latest, Path.Combine(root, "engines"), timeout.Token);
+        Assert(Hash(executable) == originalHash && File.Exists(target), "original replaced");
+        if (DependencyUpdates.ParseVersion(await service.GetVersionAsync()) == latest.Version)
+            Assert(Hash(target) == originalHash, "supplied rclone differs from official download");
+        var winFsp = await updates.CheckWinFspAsync(timeout.Token);
+        var msi = await updates.DownloadWinFspAsync(winFsp, Path.Combine(root, "downloads"), timeout.Token);
+        Assert(Hash(msi).Equals(winFsp.Sha256, StringComparison.OrdinalIgnoreCase), "installer hash");
+        await Throws<InvalidDataException>(() => updates.DownloadWinFspAsync(winFsp with { Sha256 = new string('0', 64) }, Path.Combine(root, "bad-hash"), timeout.Token));
+        Assert(!Directory.EnumerateFiles(Path.Combine(root, "bad-hash")).Any(), "bad download retained");
+    });
 await Test("真实 lsjson、size 和连接检查", async () =>
 {
     var files = await service.ListFilesAsync(source);
@@ -178,6 +218,7 @@ await Test("OAuth 非交互后续提问与无授权取消保留原配置", async
     var before = File.ReadAllBytes(settings.ConfigPath);
     await using (var oauth = await service.BeginProviderConfigurationAsync("cancelled-drive", "drive", new Dictionary<string, string>()))
     {
+        if (oauth.CurrentStep.Option?.Name == "config_shared_client_id") await oauth.AdvanceAsync("true");
         Assert(!oauth.CurrentStep.Complete && oauth.CurrentStep.Option?.Name == "config_is_local", "OAuth initial question");
         var step = await oauth.AdvanceAsync("false");
         Assert(!step.Complete && step.Option is not null && step.Option.Name == "config_token", "OAuth external token question");
@@ -190,6 +231,7 @@ await Test("OAuth 本机授权持续等待超过4秒，取消回收专属进程"
 {
     var before = File.ReadAllBytes(settings.ConfigPath);
     await using var oauth = await service.BeginProviderConfigurationAsync("pending-drive", "drive", new Dictionary<string, string>(), openBrowser: false);
+    if (oauth.CurrentStep.Option?.Name == "config_shared_client_id") await oauth.AdvanceAsync("true");
     var authorization = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
     oauth.AuthorizationUrlAvailable += (_, url) => authorization.TrySetResult(url);
     using var cancellation = new CancellationTokenSource();
