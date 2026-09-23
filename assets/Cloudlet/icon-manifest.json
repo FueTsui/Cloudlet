@@ -1,0 +1,466 @@
+{
+  "schemaVersion": 1,
+  "product": "Cloudlet",
+  "generator": "scripts/build-icons.ps1",
+  "operation": "Byte-identical PNG copies and size-only ICO encoding; no redrawing, recoloring, cropping, or background removal.",
+  "defaultVariant": "black",
+  "sizes": [
+    16,
+    20,
+    24,
+    32,
+    40,
+    48,
+    64,
+    128,
+    256
+  ],
+  "encoder": "Windows System.Drawing; PNG-compressed 32-bit RGBA ICO frames; high-quality bicubic downsampling of the complete source canvas.",
+  "sourcesUnchanged": true,
+  "sources": [
+    {
+      "path": "output/imagegen/cloud-soft-3d-v2/cloud-black.png",
+      "sha256": "9c9ec3a00453a13577ee01b53211154c5c177567840ccf4e7cc8d588babc0214",
+      "image": {
+        "width": 1254,
+        "height": 1254,
+        "pixelFormat": "Format32bppArgb",
+        "alpha": {
+          "minimum": 0,
+          "maximum": 255,
+          "transparent": 1035932,
+          "translucent": 535508,
+          "opaque": 1076,
+          "total": 1572516
+        },
+        "hasTransparency": true,
+        "nontransparentBounds": {
+          "left": 33,
+          "top": 53,
+          "right": 1223,
+          "bottom": 1114
+        }
+      }
+    },
+    {
+      "path": "output/imagegen/cloud-soft-3d-v2/cloud-white.png",
+      "sha256": "f9311ec9503eb85999f013290f3348118ea8d00bc0a7409696a206d0984aa4d8",
+      "image": {
+        "width": 1254,
+        "height": 1254,
+        "pixelFormat": "Format32bppArgb",
+        "alpha": {
+          "minimum": 0,
+          "maximum": 255,
+          "transparent": 1035351,
+          "translucent": 535665,
+          "opaque": 1500,
+          "total": 1572516
+        },
+        "hasTransparency": true,
+        "nontransparentBounds": {
+          "left": 33,
+          "top": 53,
+          "right": 1195,
+          "bottom": 1194
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "path": "assets/Cloudlet/icon-black.png",
+      "sha256": "9c9ec3a00453a13577ee01b53211154c5c177567840ccf4e7cc8d588babc0214",
+      "bytes": 577693,
+      "byteIdenticalToSource": true,
+      "image": {
+        "width": 1254,
+        "height": 1254,
+        "pixelFormat": "Format32bppArgb",
+        "alpha": {
+          "minimum": 0,
+          "maximum": 255,
+          "transparent": 1035932,
+          "translucent": 535508,
+          "opaque": 1076,
+          "total": 1572516
+        },
+        "hasTransparency": true,
+        "nontransparentBounds": {
+          "left": 33,
+          "top": 53,
+          "right": 1223,
+          "bottom": 1114
+        }
+      }
+    },
+    {
+      "path": "assets/Cloudlet/icon-black.ico",
+      "sha256": "b69dd4bc105d07f6fe1f9a5d96eea029a3b86be39e513cf3a2cdeba95fbc66bf",
+      "bytes": 57150,
+      "icon": {
+        "frameCount": 9,
+        "frames": [
+          {
+            "width": 16,
+            "height": 16,
+            "planes": 1,
+            "bitCount": 32,
+            "bytes": 585,
+            "offset": 150,
+            "alpha": {
+              "minimum": 0,
+              "maximum": 255,
+              "transparent": 143,
+              "translucent": 76,
+              "opaque": 37,
+              "total": 256
+            },
+            "windowsIconReadable": true
+          },
+          {
+            "width": 20,
+            "height": 20,
+            "planes": 1,
+            "bitCount": 32,
+            "bytes": 727,
+            "offset": 735,
+            "alpha": {
+              "minimum": 0,
+              "maximum": 255,
+              "transparent": 234,
+              "translucent": 124,
+              "opaque": 42,
+              "total": 400
+            },
+            "windowsIconReadable": true
+          },
+          {
+            "width": 24,
+            "height": 24,
+            "planes": 1,
+            "bitCount": 32,
+            "bytes": 911,
+            "offset": 1462,
+            "alpha": {
+              "minimum": 0,
+              "maximum": 255,
+              "transparent": 347,
+              "translucent": 183,
+              "opaque": 46,
+              "total": 576
+            },
+            "windowsIconReadable": true
+          },
+          {
+            "width": 32,
+            "height": 32,
+            "planes": 1,
+            "bitCount": 32,
+            "bytes": 1299,
+            "offset": 2373,
+            "alpha": {
+              "minimum": 0,
+              "maximum": 255,
+              "transparent": 637,
+              "translucent": 317,
+              "opaque": 70,
+              "total": 1024
+            },
+            "windowsIconReadable": true
+          },
+          {
+            "width": 40,
+            "height": 40,
+            "planes": 1,
+            "bitCount": 32,
+            "bytes": 1800,
+            "offset": 3672,
+            "alpha": {
+              "minimum": 0,
+              "maximum": 255,
+              "transparent": 1010,
+              "translucent": 503,
+              "opaque": 87,
+              "total": 1600
+            },
+            "windowsIconReadable": true
+          },
+          {
+            "width": 48,
+            "height": 48,
+            "planes": 1,
+            "bitCount": 32,
+            "bytes": 2374,
+            "offset": 5472,
+            "alpha": {
+              "minimum": 0,
+              "maximum": 255,
+              "transparent": 1469,
+              "translucent": 734,
+              "opaque": 101,
+              "total": 2304
+            },
+            "windowsIconReadable": true
+          },
+          {
+            "width": 64,
+            "height": 64,
+            "planes": 1,
+            "bitCount": 32,
+            "bytes": 3662,
+            "offset": 7846,
+            "alpha": {
+              "minimum": 0,
+              "maximum": 255,
+              "transparent": 2647,
+              "translucent": 1312,
+              "opaque": 137,
+              "total": 4096
+            },
+            "windowsIconReadable": true
+          },
+          {
+            "width": 128,
+            "height": 128,
+            "planes": 1,
+            "bitCount": 32,
+            "bytes": 10956,
+            "offset": 11508,
+            "alpha": {
+              "minimum": 0,
+              "maximum": 255,
+              "transparent": 10726,
+              "translucent": 5367,
+              "opaque": 291,
+              "total": 16384
+            },
+            "windowsIconReadable": true
+          },
+          {
+            "width": 256,
+            "height": 256,
+            "planes": 1,
+            "bitCount": 32,
+            "bytes": 34686,
+            "offset": 22464,
+            "alpha": {
+              "minimum": 0,
+              "maximum": 255,
+              "transparent": 43168,
+              "translucent": 21716,
+              "opaque": 652,
+              "total": 65536
+            },
+            "windowsIconReadable": true
+          }
+        ],
+        "windowsIconReadable": true,
+        "validation": "Directory and embedded PNG sizes match; each isolated frame and the complete ICO decode to a Windows icon handle."
+      }
+    },
+    {
+      "path": "assets/Cloudlet/icon-white.png",
+      "sha256": "f9311ec9503eb85999f013290f3348118ea8d00bc0a7409696a206d0984aa4d8",
+      "bytes": 549472,
+      "byteIdenticalToSource": true,
+      "image": {
+        "width": 1254,
+        "height": 1254,
+        "pixelFormat": "Format32bppArgb",
+        "alpha": {
+          "minimum": 0,
+          "maximum": 255,
+          "transparent": 1035351,
+          "translucent": 535665,
+          "opaque": 1500,
+          "total": 1572516
+        },
+        "hasTransparency": true,
+        "nontransparentBounds": {
+          "left": 33,
+          "top": 53,
+          "right": 1195,
+          "bottom": 1194
+        }
+      }
+    },
+    {
+      "path": "assets/Cloudlet/icon-white.ico",
+      "sha256": "0bed6d2b20ccf0188245861be5e3434f121c7ed74df40ce0bb81c35a43db9025",
+      "bytes": 51785,
+      "icon": {
+        "frameCount": 9,
+        "frames": [
+          {
+            "width": 16,
+            "height": 16,
+            "planes": 1,
+            "bitCount": 32,
+            "bytes": 550,
+            "offset": 150,
+            "alpha": {
+              "minimum": 0,
+              "maximum": 255,
+              "transparent": 143,
+              "translucent": 80,
+              "opaque": 33,
+              "total": 256
+            },
+            "windowsIconReadable": true
+          },
+          {
+            "width": 20,
+            "height": 20,
+            "planes": 1,
+            "bitCount": 32,
+            "bytes": 656,
+            "offset": 700,
+            "alpha": {
+              "minimum": 0,
+              "maximum": 255,
+              "transparent": 235,
+              "translucent": 128,
+              "opaque": 37,
+              "total": 400
+            },
+            "windowsIconReadable": true
+          },
+          {
+            "width": 24,
+            "height": 24,
+            "planes": 1,
+            "bitCount": 32,
+            "bytes": 846,
+            "offset": 1356,
+            "alpha": {
+              "minimum": 0,
+              "maximum": 255,
+              "transparent": 348,
+              "translucent": 185,
+              "opaque": 43,
+              "total": 576
+            },
+            "windowsIconReadable": true
+          },
+          {
+            "width": 32,
+            "height": 32,
+            "planes": 1,
+            "bitCount": 32,
+            "bytes": 1170,
+            "offset": 2202,
+            "alpha": {
+              "minimum": 0,
+              "maximum": 255,
+              "transparent": 640,
+              "translucent": 316,
+              "opaque": 68,
+              "total": 1024
+            },
+            "windowsIconReadable": true
+          },
+          {
+            "width": 40,
+            "height": 40,
+            "planes": 1,
+            "bitCount": 32,
+            "bytes": 1605,
+            "offset": 3372,
+            "alpha": {
+              "minimum": 0,
+              "maximum": 255,
+              "transparent": 1014,
+              "translucent": 503,
+              "opaque": 83,
+              "total": 1600
+            },
+            "windowsIconReadable": true
+          },
+          {
+            "width": 48,
+            "height": 48,
+            "planes": 1,
+            "bitCount": 32,
+            "bytes": 2134,
+            "offset": 4977,
+            "alpha": {
+              "minimum": 0,
+              "maximum": 255,
+              "transparent": 1473,
+              "translucent": 731,
+              "opaque": 100,
+              "total": 2304
+            },
+            "windowsIconReadable": true
+          },
+          {
+            "width": 64,
+            "height": 64,
+            "planes": 1,
+            "bitCount": 32,
+            "bytes": 3247,
+            "offset": 7111,
+            "alpha": {
+              "minimum": 0,
+              "maximum": 255,
+              "transparent": 2663,
+              "translucent": 1292,
+              "opaque": 141,
+              "total": 4096
+            },
+            "windowsIconReadable": true
+          },
+          {
+            "width": 128,
+            "height": 128,
+            "planes": 1,
+            "bitCount": 32,
+            "bytes": 9724,
+            "offset": 10358,
+            "alpha": {
+              "minimum": 0,
+              "maximum": 255,
+              "transparent": 10773,
+              "translucent": 5326,
+              "opaque": 285,
+              "total": 16384
+            },
+            "windowsIconReadable": true
+          },
+          {
+            "width": 256,
+            "height": 256,
+            "planes": 1,
+            "bitCount": 32,
+            "bytes": 31703,
+            "offset": 20082,
+            "alpha": {
+              "minimum": 0,
+              "maximum": 255,
+              "transparent": 43351,
+              "translucent": 21618,
+              "opaque": 567,
+              "total": 65536
+            },
+            "windowsIconReadable": true
+          }
+        ],
+        "windowsIconReadable": true,
+        "validation": "Directory and embedded PNG sizes match; each isolated frame and the complete ICO decode to a Windows icon handle."
+      }
+    },
+    {
+      "path": "assets/Cloudlet/icon.ico",
+      "sha256": "b69dd4bc105d07f6fe1f9a5d96eea029a3b86be39e513cf3a2cdeba95fbc66bf",
+      "bytes": 57150,
+      "byteIdenticalTo": "assets/Cloudlet/icon-black.ico"
+    },
+    {
+      "path": "assets/Cloudlet/icon.png",
+      "sha256": "9c9ec3a00453a13577ee01b53211154c5c177567840ccf4e7cc8d588babc0214",
+      "bytes": 577693,
+      "byteIdenticalTo": "assets/Cloudlet/icon-black.png"
+    }
+  ]
+}

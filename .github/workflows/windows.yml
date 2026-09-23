@@ -1,0 +1,44 @@
+name: Windows CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Build and non-mount integration tests
+    runs-on: windows-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install .NET SDK from global.json
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Fetch verified build dependencies
+        run: pwsh -NoProfile -File scripts/fetch-dependencies.ps1
+
+      - name: Build Cloudlet for Windows x64
+        run: dotnet build src/RcloneLink.App/RcloneLink.App.csproj --configuration Release -p:Platform=x64
+
+      # This job does not install WinFsp, mount drives, authorize user accounts,
+      # or launch the desktop UI. Provider tests use isolated temporary configs.
+      - name: Run 15 non-mount integration tests
+        run: dotnet run --project tests/RcloneLink.Core.Tests/RcloneLink.Core.Tests.csproj --configuration Release -- "$env:GITHUB_WORKSPACE\rclone.exe" --skip-mount
